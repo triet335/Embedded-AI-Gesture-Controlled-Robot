@@ -1,6 +1,6 @@
 import serial, time, csv
 
-COM_PORT = 'COM6'  # Nhớ sửa lại cổng COM
+COM_PORT = 'COM10'  # Nhớ sửa lại cổng COM
 BAUD_RATE = 115200
 
 # 5 Trạng thái (Nhãn) để điều khiển xe

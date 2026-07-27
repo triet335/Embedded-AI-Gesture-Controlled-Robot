@@ -205,8 +205,15 @@ void Read_ESP32_Data(void)
         huart6.RxState = HAL_UART_STATE_READY;
     }
 }
-void Transmit_UART(void){
-	sprintf(uart_buffer, "Chui: %.2f | Nghieng: %.2f | Xoay(om cua): %.2f\r\n", pitch, roll, yaw);
+// void Transmit_UART(void){
+// 	sprintf(uart_buffer, "Chui: %.2f | Nghieng: %.2f | Xoay(om cua): %.2f\r\n", pitch, roll, yaw);
+//     HAL_UART_Transmit(&huart2, (uint8_t*)uart_buffer, strlen(uart_buffer), 100);
+// }
+
+void Transmit_Train_Data(void)
+{
+    // Gửi đúng 2 giá trị pitch và roll (ép kiểu int) cách nhau bằng dấu phẩy
+    sprintf(uart_buffer, "%d,%d\r\n", (int)pitch, (int)roll);
     HAL_UART_Transmit(&huart2, (uint8_t*)uart_buffer, strlen(uart_buffer), 100);
 }
 
@@ -266,34 +273,55 @@ void Xe_DieuKhien_GocNghieng(void)
 }
 
 // --- BỘ NÃO AI MỚI ĐƯỢC HUẤN LUYỆN TỪ DỮ LIỆU THỰC TẾ ---
-int AI_Predict(int16_t ax, int16_t ay, int16_t az, int16_t gx, int16_t gy, int16_t gz) {
-    if (ax <= -5118) {
-        return 4; // Rẽ Phải
-    } else {
-        if (ay <= 528) {
-            if (ax <= 6432) {
-                return 1; // Chạy Tới
+//int AI_Predict(int16_t current_pitch, int16_t current_roll) {
+//     if (current_pitch <= -11.50) {
+//         return 4; // Rẽ Phải
+//     } else {
+//         if (current_roll <= 42.50) {
+//             if (current_pitch <= 11.50) {
+//                 return 1; // Chạy Tới
+//             } else {
+//                 return 3; // Rẽ Trái
+//             }
+//         } else {
+//             if (current_roll <= -42.50) {
+//                 return 0; // Dừng Xe
+//             } else {
+//                 return 2; // Chạy Lùi
+//             }
+//         }
+//     }
+// }
+
+
+int AI_Predict(float current_pitch, float current_roll) {
+    if (current_pitch <= 39.00) {
+        if (current_roll <= 23.50) {
+            if (current_pitch <= -2.00) {
+                return 4; // TRAI
             } else {
-                return 3; // Rẽ Trái
+                if (current_roll <= -18.50) {
+                    return 2; // TOI
+                } else {
+                    return 0; // DUNG XE
+                }
             }
         } else {
-            if (ay <= 6546) {
-                return 0; // Dừng Xe
-            } else {
-                return 2; // Chạy Lùi
-            }
+            return 1; // LUI
         }
+    } else {
+        return 3; // PHAI
     }
 }
 
+
 void Xe_DieuKhien_AI(void)
 {
-    uint32_t TocDo = 600;
-    uint32_t BeLai = 750;
+    uint32_t TocDo = 800;
+    uint32_t BeLai = 850;
 
     // Đưa dữ liệu RAW vào bộ não AI để lấy kết quả
-    int trang_thai = AI_Predict(remote_data.ax, remote_data.ay, remote_data.az,
-                                remote_data.gx, remote_data.gy, remote_data.gz);
+    int trang_thai = AI_Predict(pitch, roll);
 
     // Xử lý hành động dựa trên kết quả AI
     if (trang_thai == 0)
@@ -383,14 +411,25 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  Read_ESP32_Data();
+// 	  Read_ESP32_Data();
 
-////      //Xe_DieuKhien_GocNghieng();
+// ////      //Xe_DieuKhien_GocNghieng();
+// 	  Xe_DieuKhien_AI();
+// ////      Transmit_UART();
+// //      Transmit_RAW_Data();
+
+//   	  HAL_Delay(5);
+
+      Read_ESP32_Data();
+      
+      // TẮT tính năng điều khiển xe
 	  Xe_DieuKhien_AI();
-////      Transmit_UART();
-//      Transmit_RAW_Data();
+      
+      // BẬT tính năng gửi dữ liệu cho Python
+      //Transmit_Train_Data();
 
   	  HAL_Delay(5);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

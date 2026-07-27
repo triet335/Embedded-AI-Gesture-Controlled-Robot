@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;Wireless1/Core/Src/mainstm.c&apos;" deleteContents="false" description="Delete resource &apos;Wireless1/Core/Src/mainstm.c&apos;" element1="/Wireless1/Core/Src/mainstm.c" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1785116397341"/>
+</session>

@@ -7,7 +7,7 @@ X = df[['pitch', 'roll']]
 y = df['label']
 
 # Huấn luyện AI với max_depth=3 để code C không bị quá dài
-model = DecisionTreeClassifier(max_depth=3, random_state=42)
+model = DecisionTreeClassifier(max_depth=4, random_state=42)
 model.fit(X, y)
 
 # In ra cấu trúc AI để copy vào STM32
